@@ -1,6 +1,7 @@
 # mpu_224-322_natural_language_communication_systems    
    
-[Системы общение на естественном языке (СОнЕЯ)](https://online.mospolytech.ru/course/view.php?id=13775)      
+[Системы общение на естественном языке (СОнЕЯ)](https://online.mospolytech.ru/course/view.php?id=13775)    
+[Введение в интеллектуальные диалоговые системы (Вспомогательный курс)](https://online.mospolytech.ru/course/view.php?id=12946)   
 Леонов Владислав Денисович 224-322    
 Московский Политехнический Университет 2 курс Магистратуры (4 семестр)    
      
