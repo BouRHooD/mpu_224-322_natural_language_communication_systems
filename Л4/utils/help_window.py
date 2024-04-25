@@ -1,5 +1,4 @@
 # Загружаем библиотеки
-import os
 import faiss  
 import gensim
 import random
@@ -9,6 +8,7 @@ import pandas as pd
 from math import sqrt
 import speech_recognition as sr    
 from gensim.models import Word2Vec
+
 from utils.generate_sqlite import *
 
 # Библиотеки GUI интерфейса (pip install PyQt5) (Qt Designer to edit *.ui - https://build-system.fman.io/qt-designer-download)
@@ -64,19 +64,21 @@ class SpeechRecognitionThread(QObject):
 
 ''' -------- Форма хелпа ------- '''   
 class HelpWindow(QMainWindow):       
-    def __init__(self, *args, **kwargs):
+    def __init__(self, _root_dir: str = '', *args, **kwargs):
         super(HelpWindow, self).__init__(*args, **kwargs)
-
+        
         # Настройки и запуск формы
+        self.ROOT_DIR = _root_dir 
+        self.dir_resource = self.ROOT_DIR + '/resources'
         self.formOpening()    
-        self.voice_ico_on = 'resources\_images\on_voice.png'    
-        self.voice_ico_off = 'resources\_images\icons_voicecontrol.png'  
+
+        self.voice_ico_on = self.dir_resource + '/_images/on_voice.png'    
+        self.voice_ico_off = self.dir_resource + '/_images/icons_voicecontrol.png'  
         self.ui.pushButton_SendByVoiseHelp.setIcon(QIcon(self.voice_ico_off))  
         
-        self.dislike = 'resources\_images\dislike.png'  
+        self.dislike = '/resources/_images/dislike.png'  
         self.ui.pushButton_Dislike.setIcon(QIcon(self.dislike))  
 
-        self.dir_resource = 'resources'
         self.isDoHelp_version = 2 # old = 1
         if self.isDoHelp_version == 1:
             self.db = SqliteInteraction(self.dir_resource + '/w2v_learn_v1/w2v_sapr.db')
@@ -130,13 +132,13 @@ class HelpWindow(QMainWindow):
         
     def formOpening(self):
         # Настройки окна главной формы
-        file_ui_path = 'GUI_HELP.ui'
-        self.file_icon_path = 'resources\_images\surflay.ico'
-        self.ui = uic.loadUi(file_ui_path)                   # GUI, должен быть в папке с main.py
-        self.ui.setWindowTitle('Леонов Владислав 224-322')   # Название главного окна
-        self.ui.setWindowIcon(QIcon(self.file_icon_path))    # Иконка на гланое окно
+        file_ui_path = self.ROOT_DIR + '/GUI_HELP.ui'
+        self.file_icon_path = self.dir_resource + '/_images/surflay.ico'
+        self.ui = uic.loadUi(file_ui_path)                    # GUI, должен быть в папке с main.py
+        self.ui.setWindowTitle('Леонов Владислав 224-322')    # Название главного окна
+        self.ui.setWindowIcon(QIcon(self.file_icon_path))     # Иконка на гланое окно
         self.ui.setWindowFlags(self.ui.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self.ui.show()                                       # Открываем окно формы  
+        self.ui.show()                                        # Открываем окно формы  
     
     def user_voice_text_value_signal(self, _text):
         self.end_get_text_from_voice_signal(True)
@@ -341,6 +343,12 @@ class HelpWindow(QMainWindow):
                     return ans_idx
                 
                 ans_idx = find_answer(inText, self.ques_vec)
+                if ans_idx is None:
+                    print("Запрос: ", inText)
+                    print("На данный запрос ответа нет, измените свой запрос 😢")
+                    self.plainTextEdit_TextDialogHelp_append_with_date_bot("На данный запрос ответа нет, измените свой запрос 😢")
+                    return
+
                 response_rubric = self.df_answers["Рубрика"][ans_idx]
                 response_question = self.df_answers["Вопрос"][ans_idx]
                 response_answer = self.df_answers["Ответ"][ans_idx]
@@ -366,3 +374,4 @@ class HelpWindow(QMainWindow):
                 self.plainTextEdit_TextDialogHelp_append_with_date_bot(f"Рубрика не обновлена!\nВведите новый запрос")
             finally:
                 self.doHelpStage = 0;       
+
